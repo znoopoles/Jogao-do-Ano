@@ -2,32 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InteractiveObject : MonoBehaviour
+public class InteractiveObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-
-    private SpriteRenderer spriteRenderer;
     private Color corNormal;
     private Color corDestaque;
+
+    public UnityEngine.UI.Image imagem;
     public InteractionLabel legenda;
     public string textoLegenda;
 
     private void Start()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        corNormal = spriteRenderer.color;
+        corNormal = imagem.color;
+        corDestaque = corNormal * 3.5f;
     }
 
-    private void OnMouseEnter ()
+    private void OnPointerEnter (PointerEventData eventData)
     {
         Debug.Log("Mouse entrou em " + gameObject.name);
-        spriteRenderer.color = Color.red; // destaca o objeto com a cor vermelha
+        imagem.color = corDestaque; // destaca o objeto com a cor vermelha
         legenda.Mostrar(textoLegenda); // mostra a legenda
     }
 
-    private void OnMouseExit ()
+    private void OnPointerExit (PointerEventData eventData)
     {
         Debug.Log("Mouse saiu de " + gameObject.name);
-        spriteRenderer.color = corNormal; // o objeto volta a cor normal
+        imagem.color = corNormal; // o objeto volta a cor normal
         legenda.Esconder(); // esconde a legenda
     }
 }
