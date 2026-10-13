@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class InteractiveObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -13,21 +14,36 @@ public class InteractiveObject : MonoBehaviour, IPointerEnterHandler, IPointerEx
 
     private void Start()
     {
+        if (imagem != null)
+        {
         corNormal = imagem.color;
         corDestaque = corNormal * 3.5f;
+        }
     }
 
-    private void OnPointerEnter (PointerEventData eventData)
+    public void OnPointerEnter(PointerEventData eventData)
     {
         Debug.Log("Mouse entrou em " + gameObject.name);
-        imagem.color = corDestaque; // destaca o objeto com a cor vermelha
-        legenda.Mostrar(textoLegenda); // mostra a legenda
+        if (imagem != null)
+        {
+            imagem.color = corDestaque; // destaca o objeto com a cor vermelha
+        }
+        if (legenda != null)
+        {
+            legenda.Mostrar(textoLegenda); // mostra a legenda
+        }
     }
 
-    private void OnPointerExit (PointerEventData eventData)
+    public void OnPointerExit(PointerEventData eventData)
     {
         Debug.Log("Mouse saiu de " + gameObject.name);
-        imagem.color = corNormal; // o objeto volta a cor normal
-        legenda.Esconder(); // esconde a legenda
+        if (imagem != null)
+        {
+            imagem.color = corNormal; // o objeto volta a cor normal
+        }
+        if (legenda != null)
+        {
+            legenda.Esconder(); // esconde a legenda
+        }
     }
 }
