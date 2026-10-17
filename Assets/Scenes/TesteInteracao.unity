@@ -257,8 +257,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83bdd90580bac0a45a5dd0683e594968, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  legenda: {fileID: 0}
-  textoLegenda: 
+  imagem: {fileID: 308309328}
+  legenda: {fileID: 1414268980}
+  textoLegenda: Mesa de cabeceira
 --- !u!114 &308309328
 MonoBehaviour:
   m_ObjectHideFlags: 0

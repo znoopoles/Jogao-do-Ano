@@ -1,33 +1,114 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class InteractiveObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    private Color corNormal;
-    private Color corDestaque;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [Tooltip("Sprite exibido enquanto o mouse estiver sobre o objeto.")]
+    [SerializeField] private Sprite spriteDestaque;
+    [SerializeField] private Image imagem;
+    [Tooltip("Componente que exibe a legenda ao passar o mouse.")]
+    [SerializeField] private InteractionLabel legenda;
+    [Tooltip("Texto exibido ao passar o mouse sobre este objeto.")]
+    [SerializeField, TextArea] private string textoLegenda;
 
-    public UnityEngine.UI.Image imagem;
-    public InteractionLabel legenda;
-    public string textoLegenda;
+    private Sprite spriteNormalRenderer;
+    private Sprite spriteNormalImagem;
+    private Color corNormalRenderer;
+    private Color corNormalImagem;
+    private Color corDestaqueRenderer;
+    private Color corDestaqueImagem;
+    private bool mouseSobre;
 
-    private void Start()
+    private void Awake()
     {
-        corNormal = imagem.color;
-        corDestaque = corNormal * 3.5f;
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+        }
+
+        if (imagem == null)
+        {
+            imagem = GetComponent<Image>();
+        }
+
+        if (spriteRenderer != null)
+        {
+            spriteNormalRenderer = spriteRenderer.sprite;
+            corNormalRenderer = spriteRenderer.color;
+            corDestaqueRenderer = corNormalRenderer * 3.5f;
+        }
+
+        if (imagem != null)
+        {
+            spriteNormalImagem = imagem.sprite;
+            corNormalImagem = imagem.color;
+            corDestaqueImagem = corNormalImagem * 3.5f;
+        }
+
+        if (legenda == null)
+        {
+            Debug.LogError("Atribua uma legenda ao componente InteractiveObject.", this);
+        }
+
+        if (spriteRenderer == null && imagem == null)
+        {
+            Debug.LogError("InteractiveObject precisa de um SpriteRenderer ou Image.", this);
+        }
     }
 
-    private void OnPointerEnter (PointerEventData eventData)
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        Debug.Log("Mouse entrou em " + gameObject.name);
-        imagem.color = corDestaque; // destaca o objeto com a cor vermelha
-        legenda.Mostrar(textoLegenda); // mostra a legenda
+        DefinirMouseSobre(true);
     }
 
-    private void OnPointerExit (PointerEventData eventData)
+    public void OnPointerExit(PointerEventData eventData)
     {
-        Debug.Log("Mouse saiu de " + gameObject.name);
-        imagem.color = corNormal; // o objeto volta a cor normal
-        legenda.Esconder(); // esconde a legenda
+        DefinirMouseSobre(false);
+    }
+
+    private void OnMouseEnter()
+    {
+        DefinirMouseSobre(true);
+    }
+
+    private void OnMouseExit()
+    {
+        DefinirMouseSobre(false);
+    }
+
+    private void DefinirMouseSobre(bool sobre)
+    {
+        if (mouseSobre == sobre)
+        {
+            return;
+        }
+
+        mouseSobre = sobre;
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.sprite = sobre && spriteDestaque != null ? spriteDestaque : spriteNormalRenderer;
+            spriteRenderer.color = sobre && spriteDestaque == null ? corDestaqueRenderer : corNormalRenderer;
+        }
+
+        if (imagem != null)
+        {
+            imagem.sprite = sobre && spriteDestaque != null ? spriteDestaque : spriteNormalImagem;
+            imagem.color = sobre && spriteDestaque == null ? corDestaqueImagem : corNormalImagem;
+        }
+
+        if (legenda != null)
+        {
+            if (sobre)
+            {
+                legenda.Mostrar(textoLegenda);
+            }
+            else
+            {
+                legenda.Esconder();
+            }
+        }
     }
 }
