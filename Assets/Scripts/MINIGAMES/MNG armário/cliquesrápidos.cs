@@ -4,6 +4,8 @@ using UnityEngine.UI;
 // Controla o preenchimento da barra quando o jogador clica no ícone.
 public class cliquesrápidos : MonoBehaviour
 {
+    public event System.Action OnIconClicked;
+
     // Referências às imagens configuradas no Inspector do Unity.
     [SerializeField] private Image iconeClique;
     [SerializeField] private Image barraVermelha;
@@ -55,6 +57,8 @@ public class cliquesrápidos : MonoBehaviour
 
         if (clicouNoIcone)
         {
+            OnIconClicked?.Invoke();
+
             // Reduz o aumento do clique conforme a barra se aproxima de 100%.
             float aumentoAtual = aumentoPorClique * Mathf.Lerp(
                 1f,
@@ -71,5 +75,16 @@ public class cliquesrápidos : MonoBehaviour
             barraVermelha.fillAmount = Mathf.Clamp01(
                 barraVermelha.fillAmount - Time.deltaTime / tempoParaEsvaziar);
         }
+    }
+
+    public void ReiniciarBarra()
+    {
+        if (barraVermelha == null)
+        {
+            Debug.LogError("Atribua a Image da barraVermelha no Inspector.", this);
+            return;
+        }
+
+        barraVermelha.fillAmount = 0f;
     }
 }
