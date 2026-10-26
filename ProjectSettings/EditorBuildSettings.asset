@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Minigame poem.unity
     guid: 0d67124bdf2445243b6fdd9c200991cd
+  - enabled: 1
+    path: Assets/Scenes/MinigameFios.unity
+    guid: 8b9c428dea94c6c47bb287034b69268d
   m_configObjects: {}
