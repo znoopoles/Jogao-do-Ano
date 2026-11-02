@@ -27,6 +27,16 @@ public class ControleConexoesUI : MonoBehaviour
             return;
         }
 
+        // Ao selecionar primeiro um fio solto e depois um conectado,
+        // o conectado volta ao início e o solto ocupa o conector liberado.
+        if (fioSelecionado != null &&
+            fioSelecionado.conectorAtual == null &&
+            fio.conectorAtual != null)
+        {
+            SubstituirFioConectado(fioSelecionado, fio);
+            return;
+        }
+
         // Se já existe um fio selecionado, remove o destaque dele.
         if (fioSelecionado != null)
         {
@@ -156,5 +166,38 @@ public class ControleConexoesUI : MonoBehaviour
         fioSelecionado = null;
 
         Debug.Log($"Fios '{primeiro.name}' e '{segundo.name}' trocaram de conector.");
+    }
+
+    private void SubstituirFioConectado(FioUI fioSolto, FioUI fioConectado)
+    {
+        ConectorUI conector = fioConectado.conectorAtual;
+        if (conector == null || conector.fioAtual != fioConectado)
+        {
+            Debug.LogError(
+                $"Não foi possível substituir '{fioConectado.name}': a conexão está inconsistente.",
+                this);
+            fioSolto.Destacar(false);
+            fioSelecionado = null;
+            return;
+        }
+
+        // O fio solto assume o conector; o fio substituído volta à sua posição de origem.
+        conector.fioAtual = fioSolto;
+        fioSolto.conectorAtual = conector;
+        fioConectado.conectorAtual = null;
+
+        fioConectado.RestaurarPosicaoInicial();
+        fioSolto.MoverPara(conector);
+
+        // Oculta a linha do fio que voltou e ativa a linha do fio que foi conectado.
+        fioConectado.AtualizarLinhaVisual();
+        fioSolto.AtualizarLinhaVisual();
+
+        fioSolto.Destacar(false);
+        fioConectado.Destacar(false);
+        fioSelecionado = null;
+
+        Debug.Log(
+            $"Fio '{fioSolto.name}' substituiu '{fioConectado.name}' no conector '{conector.name}'.");
     }
 }

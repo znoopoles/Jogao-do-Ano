@@ -27,6 +27,9 @@ public class FioUI : MonoBehaviour,
     private Color corOriginal;
     private RectTransform rectTransform;
     private RectTransform rectTransformLinha;
+    private Vector2 posicaoInicial;
+    private Quaternion rotacaoInicial;
+    private Vector3 escalaInicial;
     private Vector3 pontoInicialLinha;
 
     // Estado atual da seleção e da posição do cursor sobre o fio.
@@ -39,6 +42,9 @@ public class FioUI : MonoBehaviour,
         imagem = GetComponent<Image>();
         corOriginal = imagem.color;
         rectTransform = GetComponent<RectTransform>();
+        posicaoInicial = rectTransform.anchoredPosition;
+        rotacaoInicial = rectTransform.localRotation;
+        escalaInicial = rectTransform.localScale;
 
         // Guarda o centro da extremidade esquerda, onde a linha permanecerá conectada.
         Vector3[] cantosFio = new Vector3[4];
@@ -141,6 +147,14 @@ public class FioUI : MonoBehaviour,
         Vector3 extremidadeDireitaFio = (cantosFio[2] + cantosFio[3]) / 2f;
         Vector3 extremidadeEsquerdaConector = (cantosConector[0] + cantosConector[1]) / 2f;
         transform.position += extremidadeEsquerdaConector - extremidadeDireitaFio;
+    }
+
+    // Restaura a posição e a transformação que o fio tinha ao iniciar.
+    public void RestaurarPosicaoInicial()
+    {
+        rectTransform.anchoredPosition = posicaoInicial;
+        rectTransform.localRotation = rotacaoInicial;
+        rectTransform.localScale = escalaInicial;
     }
 
     // Mostra e dimensiona a linha entre a posição inicial do fio e sua posição atual.
