@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -7,6 +6,8 @@ public class TrocarPainel : MonoBehaviour, IPointerClickHandler
     [SerializeField] private GameObject painelDestino;
     [SerializeField] private GameObject painelAtual;
     [SerializeField] private bool desativarPainelAtual = true;
+
+    public event System.Action AntesDeTrocar;
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -22,12 +23,16 @@ public class TrocarPainel : MonoBehaviour, IPointerClickHandler
     {
         if (painelDestino == null)
         {
-            Debug.LogError("Escolha um painel de destino no Inspector.");
+            Debug.LogError("Escolha um painel de destino no Inspector.", this);
             return;
         }
 
+        AntesDeTrocar?.Invoke();
+
         if (desativarPainelAtual && painelAtual != null)
+        {
             painelAtual.SetActive(false);
+        }
 
         painelDestino.SetActive(true);
     }

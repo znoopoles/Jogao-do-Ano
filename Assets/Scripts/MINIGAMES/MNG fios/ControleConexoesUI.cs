@@ -3,9 +3,47 @@ using UnityEngine;
 public class ControleConexoesUI : MonoBehaviour
 {
     private FioUI fioSelecionado;
+    private bool interacaoBloqueada;
+
+    public void BloquearInteracao()
+    {
+        interacaoBloqueada = true;
+        CancelarSelecao();
+    }
+
+    public void LiberarInteracao()
+    {
+        interacaoBloqueada = false;
+    }
+
+    public void CancelarSelecao(FioUI fio)
+    {
+        if (fioSelecionado != fio)
+        {
+            return;
+        }
+
+        CancelarSelecao();
+    }
+
+    public void CancelarSelecao()
+    {
+        if (fioSelecionado == null)
+        {
+            return;
+        }
+
+        fioSelecionado.Destacar(false);
+        fioSelecionado = null;
+    }
 
     public void SelecionarFio(FioUI fio)
     {
+        if (interacaoBloqueada)
+        {
+            return;
+        }
+
         if (fio == null)
         {
             Debug.LogError("Não é possível selecionar um fio nulo.", this);
@@ -24,6 +62,11 @@ public class ControleConexoesUI : MonoBehaviour
 
         if (fioSelecionado == fio)
         {
+            if (fio.conectorAtual != null)
+            {
+                DesconectarFio(fio);
+            }
+
             return;
         }
 
@@ -50,8 +93,37 @@ public class ControleConexoesUI : MonoBehaviour
         Debug.Log("Fio selecionado: " + fio.name);
     }
 
+    private void DesconectarFio(FioUI fio)
+    {
+        ConectorUI conector = fio.conectorAtual;
+        if (conector == null || conector.fioAtual != fio)
+        {
+            Debug.LogError(
+                $"Não foi possível desconectar '{fio.name}': a conexão está inconsistente.",
+                this);
+            fio.Destacar(false);
+            fioSelecionado = null;
+            return;
+        }
+
+        conector.fioAtual = null;
+        fio.conectorAtual = null;
+        fio.RestaurarPosicaoInicial();
+        fio.AtualizarLinhaVisual();
+        fio.Destacar(false);
+        fioSelecionado = null;
+
+        Debug.Log($"Fio '{fio.name}' desconectado e restaurado à posição inicial.");
+        Voltagem.RecalcularTodas();
+    }
+
     public void SelecionarConector(ConectorUI conector)
     {
+        if (interacaoBloqueada)
+        {
+            return;
+        }
+
         if (conector == null)
         {
             Debug.LogError("Não é possível selecionar um conector nulo.", this);
@@ -128,6 +200,7 @@ public class ControleConexoesUI : MonoBehaviour
         fioMovido.Destacar(false);
         Debug.Log($"Fio '{fioMovido.name}' conectado ao conector '{conector.name}'.");
         fioSelecionado = null;
+        Voltagem.RecalcularTodas();
     }
 
     private void TrocarFios(FioUI primeiro, FioUI segundo)
@@ -166,6 +239,7 @@ public class ControleConexoesUI : MonoBehaviour
         fioSelecionado = null;
 
         Debug.Log($"Fios '{primeiro.name}' e '{segundo.name}' trocaram de conector.");
+        Voltagem.RecalcularTodas();
     }
 
     private void SubstituirFioConectado(FioUI fioSolto, FioUI fioConectado)
@@ -199,5 +273,6 @@ public class ControleConexoesUI : MonoBehaviour
 
         Debug.Log(
             $"Fio '{fioSolto.name}' substituiu '{fioConectado.name}' no conector '{conector.name}'.");
+        Voltagem.RecalcularTodas();
     }
 }

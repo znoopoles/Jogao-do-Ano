@@ -71,6 +71,21 @@ public class FioUI : MonoBehaviour,
         linhaLigacao.gameObject.SetActive(false);
     }
 
+    private void OnDisable()
+    {
+        mouseSobre = false;
+
+        if (controle != null)
+        {
+            controle.CancelarSelecao(this);
+        }
+
+        if (imagem != null && selecionado)
+        {
+            Destacar(false);
+        }
+    }
+
     // Informa ao controlador que este fio foi clicado para ser selecionado.
     public void OnPointerClick(PointerEventData eventData)
     {
