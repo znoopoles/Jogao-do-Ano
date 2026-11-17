@@ -5,12 +5,14 @@ public class TemporizadorGlobal : MonoBehaviour
 {
     [Header("Interface")]
     [SerializeField] private TMP_Text textoTempo;
+    [SerializeField] private GameObject painelInicio;
 
     [Header("Partida")]
     [SerializeField, Min(0f)] private float tempoInicialSegundos = 60f;
     [SerializeField] private GerenciadorPartidaFios gerenciadorPartida;
 
     private float tempoRestante;
+    private bool iniciado;
     private bool contando;
     private bool encerrado;
 
@@ -24,6 +26,13 @@ public class TemporizadorGlobal : MonoBehaviour
         if (textoTempo == null)
         {
             Debug.LogError("Atribua um texto TextMeshPro para o temporizador.", this);
+            enabled = false;
+            return;
+        }
+
+        if (painelInicio == null)
+        {
+            Debug.LogError("Atribua o painel que inicia o temporizador no Inspector.", this);
             enabled = false;
             return;
         }
@@ -49,17 +58,15 @@ public class TemporizadorGlobal : MonoBehaviour
         tempoRestante = tempoInicialSegundos;
         AtualizarTexto();
 
-        if (tempoRestante <= 0f)
-        {
-            EncerrarTemporizador();
-            return;
-        }
-
-        contando = true;
+        if (painelInicio.activeInHierarchy)
+            IniciarTemporizador();
     }
 
     private void Update()
     {
+        if (!iniciado && painelInicio.activeInHierarchy)
+            IniciarTemporizador();
+
         if (!contando)
             return;
 
@@ -82,8 +89,24 @@ public class TemporizadorGlobal : MonoBehaviour
 
     public void Retomar()
     {
-        if (encerrado || tempoRestante <= 0f)
+        if (!iniciado || encerrado || tempoRestante <= 0f)
             return;
+
+        contando = true;
+    }
+
+    private void IniciarTemporizador()
+    {
+        if (iniciado || encerrado)
+            return;
+
+        iniciado = true;
+
+        if (tempoRestante <= 0f)
+        {
+            EncerrarTemporizador();
+            return;
+        }
 
         contando = true;
     }

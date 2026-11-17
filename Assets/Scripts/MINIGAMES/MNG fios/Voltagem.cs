@@ -11,6 +11,7 @@ public class Voltagem : MonoBehaviour
     private FioUI[] fios;
     private ConectorUI[] conectores;
     private int[,] valoresEmVolts;
+    private bool[,] conexoesCorretas;
 
     public int VoltagemIdeal => voltagemIdeal;
     public long VoltagemAtual { get; private set; }
@@ -41,6 +42,7 @@ public class Voltagem : MonoBehaviour
     public void GerarNovaPartida()
     {
         valoresEmVolts = null;
+        conexoesCorretas = null;
         VoltagemAtual = 0;
 
         if (textoVoltagem == null)
@@ -94,7 +96,7 @@ public class Voltagem : MonoBehaviour
         }
 
         valoresEmVolts = new int[fios.Length, conectores.Length];
-        bool[,] conexoesDaSolucao = new bool[fios.Length, conectores.Length];
+        conexoesCorretas = new bool[fios.Length, conectores.Length];
         FioUI[] fiosSolucao = (FioUI[])fios.Clone();
         ConectorUI[] conectoresSolucao = (ConectorUI[])conectores.Clone();
         Embaralhar(fiosSolucao);
@@ -117,7 +119,7 @@ public class Voltagem : MonoBehaviour
             int indiceConector = System.Array.IndexOf(conectores, conectoresSolucao[i]);
 
             valoresEmVolts[indiceFio, indiceConector] = valorSolucao;
-            conexoesDaSolucao[indiceFio, indiceConector] = true;
+            conexoesCorretas[indiceFio, indiceConector] = true;
             restante -= valorSolucao;
         }
 
@@ -135,7 +137,7 @@ public class Voltagem : MonoBehaviour
         {
             for (int j = 0; j < conectores.Length; j++)
             {
-                if (!conexoesDaSolucao[i, j])
+                if (!conexoesCorretas[i, j])
                 {
                     valoresEmVolts[i, j] = valoresAleatorios[indiceValorAleatorio];
                     indiceValorAleatorio++;
@@ -176,6 +178,24 @@ public class Voltagem : MonoBehaviour
             {
                 totalEmVolts += valoresEmVolts[i, indiceConector];
             }
+        }
+
+        for (int i = 0; i < conectores.Length; i++)
+        {
+            ConectorUI conector = conectores[i];
+            FioUI fio = conector.fioAtual;
+            bool conexaoCorreta = false;
+
+            if (fio != null && fio.conectorAtual == conector)
+            {
+                int indiceFio = System.Array.IndexOf(fios, fio);
+                if (indiceFio >= 0)
+                {
+                    conexaoCorreta = conexoesCorretas[indiceFio, i];
+                }
+            }
+
+            conector.AtualizarEstado(conexaoCorreta);
         }
 
         VoltagemAtual = totalEmVolts;
